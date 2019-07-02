@@ -29,7 +29,7 @@ const CartItemComponent = (props) => {
 }
 
 const CartItems = ({items}) => {
-  console.log(items)
+
   let itemList = items.map(item => <CartItemComponent key={item.id} product={item.product.name} price={item.product.priceInCents} quantity={item.quantity} />)
 
   return (
@@ -62,18 +62,26 @@ const TotalPrice = ({price}) => {
 
 class AddItem extends React.Component {
 
-  itemList = this.props.items.map(item => <option>{item.name}</option>)
+  itemList = this.props.items.map(item => <option value={item.name}>{item.name}</option>)
 
-  state = {}
+  constructor(props){
+    super(props)
+    this.state = {
+      quantity: 0,
+      product: this.props.items[0].name
+    }
+  }
 
   onSubmit = (e) => {
     e.preventDefault()
 
+    // find product's ID and price from Parent's array of items
     let indexOfAddedItem = this.props.items.findIndex(i => i.name === this.state.product);
 
     let idOfAddedItem = this.props.items[indexOfAddedItem]['id']
     let priceOfAddedItem = this.props.items[indexOfAddedItem]['priceInCents']
 
+    // construct data to be sent back to Parent
     let itemFormatted = {
       product: {
         id: idOfAddedItem,
@@ -82,6 +90,8 @@ class AddItem extends React.Component {
       },
       quantity: this.state.quantity
     }
+
+    // return to Parent with props function
     this.props.onItemAdded(itemFormatted)
   }
 
@@ -100,8 +110,7 @@ class AddItem extends React.Component {
               Products
             </label>
             <select className="form-control" onChange={ (e) => this.setState({product: e.target.value})} required>
-              <option disabled>Select an Option...</option>
-            {this.itemList}
+              {this.itemList}
             </select>
           </div>
           <input type="submit" className="btn btn-primary" value="Submit" />
@@ -168,8 +177,6 @@ class App extends React.Component{
     }))
   }
 
-
-
   render() {
     return (
       <div>
@@ -181,7 +188,6 @@ class App extends React.Component{
       </div>
     );
   }
-
 }
 
 export default App;
